@@ -112,7 +112,7 @@
      const uTransformationMatrixPointer = gl.getUniformLocation(program, 'u_transformation_matrix');
 
       var square_vertices = [
-      -0.25,-0.25, 0, 1.0, 
+      -0.25,-0.5, 0, 1.0, 
       -0.25, 0.25, 0, 1.0, 
        0.25, 0.25, 0.0, 1.0, 
        0.25,-0.25, 0.0, 1.0  
@@ -149,6 +149,10 @@
 
 // function to draw the scene from the user inputs
       function drawScene() {
+
+        console.log(square_vertices *transformationMatrix);
+
+
         // clear the screen
         gl.clearColor(0,0,0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -164,17 +168,17 @@
       // initial render
       drawScene();
 
+      let tr_x=0, tr_y=0, Sx=1, Sy=1;
+      let degrees = 0;
+
       function redraw(code){
       	return function(){
           //Declaration and initialization of translation,scaling,rotation factors
-      		let tr_x=0, tr_y=0, Sx=1, Sy=1;
-      	  let degrees = 0;
-      	
-        	if (code=="tx") tr_x = (document.getElementById("tx")).value; 
-      		if (code=="ty") tr_y = (document.getElementById("ty")).value;
+        	if (code=="tx") tr_x = tr_x + Number((document.getElementById("tx")).value); 
+      		if (code=="ty") tr_y = tr_y + Number((document.getElementById("ty")).value);
           if (code=="both"){
-            tr_x = (document.getElementById("tx")).value; 
-            tr_y = (document.getElementById("ty")).value;
+            tr_x = tr_x + Number((document.getElementById("tx")).value);
+            tr_y = tr_y + Number((document.getElementById("ty")).value);
           }
           
           if (code!="scaled"){
@@ -204,6 +208,7 @@
           let sinValue = Math.sin(radians);
       	  
         //rendering again after reflecting the transformations
+          console.log(tr_x + " " + typeof(tr_x));
       	drawScene();
       }
       }
