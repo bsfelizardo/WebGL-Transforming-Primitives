@@ -12,11 +12,13 @@
  <button id="translateY">MOVE Y</button>
  <button id="translate">MOVE</button>
  <button id="scale">SCALE</button>
+ <button id="rotate">ROTATE</button>
  <br>
- X = <input type="text" id="tx" value="0">
- Y = <input type="text" id="ty" value="0">
- SCALE X by = <input type="text" id="Sx" value="0">
- SCALE Y by = <input type="text" id="Sy" value="0">
+ X = <input type="number" id="tx" value="0">
+ Y = <input type="number" id="ty" value="0">
+ SCALE X by = <input type="number" id="Sx" value="0">
+ SCALE Y by = <input type="number" id="Sy" value="0">
+ ROTATION ANGLE = <input type="number" id="deg" value="0">
   
   <!-- VERTEX SHADER -->
   <script id="vertex-shader" type="notjs">#version 300 es
@@ -180,8 +182,9 @@
             tr_x = tr_x + Number((document.getElementById("tx")).value);
             tr_y = tr_y + Number((document.getElementById("ty")).value);
           }
-          
-          if (code!="scaled"){
+          if(code=="rotate") degrees = degrees + Number((document.getElementById("deg")).value);
+
+          if (["tx", "ty", "both"].includes(code)){
             transformationMatrix = [
             1,0,0,0,
             0,1,0,0,
@@ -201,11 +204,18 @@
             0,0,0,1
             ];
           }
-      	
-        //For ROTATION
-          let radians = Math.PI*degrees/180;
-          let cosValue = Math.cos(radians);
-          let sinValue = Math.sin(radians);
+          if (code=="rotate"){
+            //For ROTATION
+            let radians = Math.PI*degrees/180;
+            let cosValue = Math.cos(radians);
+            let sinValue = Math.sin(radians);
+            transformationMatrix = [
+              cosValue,sinValue , 0, 0,
+              -1*sinValue, cosValue, 0, 0,
+              0, 0, 1, 0,
+              0, 0, 0, 1
+            ]
+          }
       	  
         //rendering again after reflecting the transformations
       	drawScene();
@@ -217,6 +227,7 @@
      document.getElementById("translateY").addEventListener("click", redraw("ty"));
      document.getElementById("translate").addEventListener("click", redraw("both"));
      document.getElementById("scale").addEventListener("click",redraw("scaled"));
+     document.getElementById("rotate").addEventListener("click",redraw("rotate"));
 }
     // call the main program
     main();
