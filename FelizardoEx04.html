@@ -190,8 +190,8 @@
             ];
           }
           if (code=="scaled"){
-            Sx = (document.getElementById("Sx")).value;
-            Sy = (document.getElementById("Sy")).value;
+            Sx = Sx + Number((document.getElementById("Sx")).value);
+            Sy = Sy + Number((document.getElementById("Sy")).value);
 
             //Transformation matrix when scaling
             transformationMatrix = [
