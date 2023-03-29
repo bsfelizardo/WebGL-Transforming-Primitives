@@ -25,11 +25,13 @@
     in vec4 a_position;
     in float a_point_size;
     //transformation matrix
-    uniform mat4 u_transformation_matrix;
+    uniform mat4 u_transformation_matrix_translation;
+    uniform mat4 u_transformation_matrix_scaling;
+    uniform mat4 u_transformation_matrix_rotation;
 
     void main() {
       //Input point passes through the transformation matrix
-      gl_Position = u_transformation_matrix * a_position;
+      gl_Position = u_transformation_matrix_translation * u_transformation_matrix_scaling * u_transformation_matrix_rotation * a_position;
       gl_PointSize = a_point_size;
     } 
   </script>
@@ -111,7 +113,10 @@
      var colorLocation = gl.getUniformLocation(program, "u_color");
      
      //Used for affine transformation
-     const uTransformationMatrixPointer = gl.getUniformLocation(program, 'u_transformation_matrix');
+     const uTransformationMatrixPointer_Translation = gl.getUniformLocation(program, 'u_transformation_matrix_translation');
+     const uTransformationMatrixPointer_Scaling = gl.getUniformLocation(program, 'u_transformation_matrix_scaling');
+     const uTransformationMatrixPointer_Rotation = gl.getUniformLocation(program, 'u_transformation_matrix_rotation');
+
 
       var square_vertices = [
       -0.25,-0.5, 0, 1.0, 
@@ -122,7 +127,21 @@
 
       //Initializing the variables and tranformation matrix
       let tx=0, ty=0;
-      let transformationMatrix = [
+      let transformationMatrix_translation = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+      ];
+      
+      let transformationMatrix_scaling = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+      ];
+
+      let transformationMatrix_rotation = [
         1,0,0,0,
         0,1,0,0,
         0,0,1,0,
@@ -152,7 +171,7 @@
 // function to draw the scene from the user inputs
       function drawScene() {
 
-        console.log(square_vertices *transformationMatrix);
+        // console.log(square_vertices *transformationMatrix);
 
 
         // clear the screen
@@ -160,7 +179,9 @@
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         // set values
-        gl.uniformMatrix4fv(uTransformationMatrixPointer, false, new Float32Array(transformationMatrix));
+        gl.uniformMatrix4fv(uTransformationMatrixPointer_Translation, false, new Float32Array(transformationMatrix_translation));
+        gl.uniformMatrix4fv(uTransformationMatrixPointer_Scaling, false, new Float32Array(transformationMatrix_scaling));
+        gl.uniformMatrix4fv(uTransformationMatrixPointer_Rotation, false, new Float32Array(transformationMatrix_rotation));
         
          // draw buffer that is bound to gl.ARRAY_BUFFER
         gl.uniform4f(colorLocation,1.0,0.5,0.0,1.0);
@@ -184,38 +205,46 @@
           }
           if(code=="rotate") degrees = degrees + Number((document.getElementById("deg")).value);
 
-          if (["tx", "ty", "both"].includes(code)){
-            transformationMatrix = [
+          // if (["tx", "ty", "both"].includes(code)){
+            transformationMatrix_translation = [
             1,0,0,0,
             0,1,0,0,
             0,0,1,0,
             tr_x,tr_y,0,1
             ];
-          }
+          // }
           if (code=="scaled"){
             Sx = Sx + Number((document.getElementById("Sx")).value);
             Sy = Sy + Number((document.getElementById("Sy")).value);
+          }
 
             //Transformation matrix when scaling
-            transformationMatrix = [
+            transformationMatrix_scaling = [
             Sx,0,0,0,
             0,Sy,0,0,
             0,0,1,0,
             0,0,0,1
             ];
-          }
-          if (code=="rotate"){
+
+          // if (code=="rotate"){
             //For ROTATION
             let radians = Math.PI*degrees/180;
             let cosValue = Math.cos(radians);
             let sinValue = Math.sin(radians);
-            transformationMatrix = [
+
+            transformationMatrix_rotation = [
               cosValue,sinValue , 0, 0,
               -1*sinValue, cosValue, 0, 0,
               0, 0, 1, 0,
               0, 0, 0, 1
             ]
-          }
+
+          // transformationMatrix = [
+          //     Sx*cosValue,sinValue , 0, 0,
+          //     -1*sinValue, Sy*cosValue, 0, 0,
+          //     0, 0, 1, 0,
+          //     tr_x, tr_y, 0, 1
+          //   ]
       	  
         //rendering again after reflecting the transformations
       	drawScene();
